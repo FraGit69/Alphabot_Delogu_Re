@@ -28,6 +28,7 @@ def on_press(key):
     try:
         if key.char in tastiConcessi:
             gestione_congestione_on_press(key.char)
+            invia_comando("stop")
     except AttributeError:
         if key == keyboard.Key.esc:
             return False
@@ -36,7 +37,6 @@ def on_release(key):
     try:
         if key.char in tastiConcessi:
             gestione_congestione_on_release(key.char)
-            invia_comando("stop")
     except AttributeError:
         pass
 
