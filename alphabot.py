@@ -15,7 +15,6 @@ alphabot_tcp.listen(1)
 print("Server AlphaBot in ascolto...")
 
 alpha = alphaLib.AlphaBot()
-alpha.stop()
 # Loop principale che accetta le connessioni dal client
 try:
     while True:
@@ -30,19 +29,18 @@ try:
                 break  # Chiude la connessione se non ci sono più messaggi
 
             print(f"Comando ricevuto: {messaggio}")
-
             # Interpretazione dei comandi per muovere l'AlphaBot
-            if messaggio == 'w':
+            if 'w' in messaggio:
                 alpha.forward()  # Avanti
-            elif messaggio == 'a':
+            elif 'a' in messaggio:
                 alpha.left()     # Sinistra
-            elif messaggio == 'd':
+            elif 'd' in messaggio:
                 alpha.right()    # Destra
-            elif messaggio == 's':
+            elif 's' in messaggio:
                 alpha.backward() # Indietro
-            elif messaggio == 'stop':
+            elif 'stop' in messaggio:
                 alpha.stop()     # Stop
-            elif messaggio == 'end':
+            elif 'end' in messaggio:
                 print("Chiusura connessione...")
                 client.close()         # Chiude la connessione al client
                 break
