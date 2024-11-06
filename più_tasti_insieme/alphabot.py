@@ -1,6 +1,29 @@
 import socket
 import alphaLib
 
+def direzione(messaggio):
+    right = 0
+    left = 0
+    if "w" in messaggio:
+        right = 50
+        left = 50
+    elif "s" in messaggio and "w" not in messaggio:
+        right = -50
+        left = -50
+    elif "a" in messaggio:
+        if right >= 0:
+            right += 20
+        else:
+            right -= 20
+    elif "d" in messaggio and "a" not in messaggio:
+        if left >= 0:
+            left += 20
+        else:
+            left -= 20
+    alpha.setMotor(left, right)
+
+
+
 tastiConcessi = ["w", "a", "s", "d"]
 alphabot_address = ("192.168.1.129", 34512)
 
@@ -17,7 +40,7 @@ try:
         while True:
             messaggio = client.recv(4096).decode('utf-8')
             if messaggio in tastiConcessi:
-                
+                direzione(messaggio)
                 print(f"Comando ricevuto: {messaggio}")
             elif messaggio == 'stop':
                 alpha.stop()
@@ -33,3 +56,5 @@ except KeyboardInterrupt:
 finally:
     alphabot_tcp.close()
     print("Server chiuso.")
+
+
