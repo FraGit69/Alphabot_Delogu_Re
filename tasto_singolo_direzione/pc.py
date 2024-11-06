@@ -1,7 +1,7 @@
 import socket
 from pynput import keyboard
 
-tastiConcessi = ["w", "a", "s", "d", "e"]
+tastiConcessi = ["w", "a", "s", "d"]
 tastiPremuti = list()
 # Definizione dell'indirizzo del server
 server_tcp_address = ("192.168.1.129", 34512)
