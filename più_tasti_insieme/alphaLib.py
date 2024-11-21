@@ -23,6 +23,7 @@ class AlphaBot(object):
 		self.PWMB = GPIO.PWM(self.ENB,500)
 		self.PWMA.start(50)
 		self.PWMB.start(50)
+		self.stop()
 
 	def forward(self):
 		GPIO.output(self.IN1,GPIO.HIGH)
