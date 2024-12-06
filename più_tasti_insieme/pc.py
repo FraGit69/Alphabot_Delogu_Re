@@ -1,5 +1,6 @@
 import socket as s
 from pynput import keyboard
+import threading as t
 
 keys_granted = ["w", "a", "s", "d"]
 keys_pressed = []
@@ -7,7 +8,7 @@ left = 0
 right = 0
 
 def client():
-    alphabot_address = ("127.0.0.1", 34512)
+    alphabot_address = ("localhost", 34512)
     try:
         # Connessione al server Alphabot
         client_tcp = s.socket(s.AF_INET, s.SOCK_STREAM)
@@ -22,8 +23,8 @@ def client():
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:
-        if 'client_tcp' in locals():
-            client_tcp.close()
+        if 'client_tcp' in locals(): # verifico che la variabile client_tcp sia tra le variabili definite
+            client_tcp.close() 
             print("Connection closed.")
 
 def on_press(key, client_tcp):
@@ -38,19 +39,33 @@ def on_press(key, client_tcp):
                 right -= 50
                 left += 50
             elif key.char == "a":
-                right += 30
+                if 'w' in keys_pressed and 'd' not in keys_pressed:
+                    right += 30
+                elif 'd' in keys_pressed and 'w' not in keys_pressed:
+                    right -= 30
+                else:
+                    right += 30
             elif key.char == "d":
-                left -= 30
-            print(f"{left},{right}")
-            client_tcp.send(f"{left},{right}".encode("utf-8"))
+                if 'w' in keys_pressed and 'a' not in keys_pressed:
+                    left -= 30
+                elif 'a' in keys_pressed and 'w' not in keys_pressed:
+                    left += 30
+                else:
+                    left -= 30
+            client_tcp.send(f"{right},{left}".encode("utf-8"))
     except AttributeError:
-        pass  # Ignora tasti speciali come Ctrl, Alt, ecc.
+        if key == keyboard.Key.esc:
+            client_tcp.send("end".encode("utf-8"))
+            return False
+        if key == keyboard.Key.shift:
+            client_tcp.send(f"100 , -100".encode("utf-8"))
+
 
 def on_release(key, client_tcp):
+    global left, right
     try:
         if key.char in keys_granted and key.char in keys_pressed:
             keys_pressed.remove(key.char)
-            global left, right
             if key.char == "w":
                 right -= 50
                 left += 50
@@ -58,13 +73,23 @@ def on_release(key, client_tcp):
                 right += 50
                 left -= 50
             elif key.char == "a":
-                right -= 30
+                if 'w' in keys_pressed and 'd' not in keys_pressed:
+                    right -= 30
+                elif 'd' in keys_pressed and 'w' not in keys_pressed:
+                    right += 30
+                else:
+                    right -= 30
             elif key.char == "d":
-                left += 30
-            print(f"{left},{right}")
-            client_tcp.send(f"{left},{right}".encode("utf-8"))
+                if 'w' in keys_pressed and 'a' not in keys_pressed:
+                    left += 30
+                elif 'a' in keys_pressed and 'w' not in keys_pressed:
+                    left -= 30
+                else:
+                    left += 30
+            client_tcp.send(f"{right},{left}".encode("utf-8"))
     except AttributeError:
-        pass  # Ignora tasti speciali come Ctrl, Alt, ecc.
+        pass
+
 
 if __name__ == "__main__":
     client()
