@@ -33,25 +33,30 @@ def on_press(key, client_tcp):
             keys_pressed.append(key.char)
             global left, right
             if key.char == "w":
+                if 'a' in keys_pressed and 's' not in keys_pressed and right<0:
+                    right+=60
+                if 'd' in keys_pressed and 's' not in keys_pressed and left >0:
+                    left-=60
+
                 right += 50
                 left -= 50
             elif key.char == "s":
+                if 'a' in keys_pressed and 'w' not in keys_pressed and right>0:
+                    right-=60
+                if 'd' in keys_pressed  and 'w' not in keys_pressed and left<0:
+                    left+=60
+
                 right -= 50
                 left += 50
+
             elif key.char == "a":
-                if 'w' in keys_pressed and 'd' not in keys_pressed:
-                    right += 30
-                elif 'd' in keys_pressed and 'w' not in keys_pressed:
-                    right -= 30
-                else:
-                    right += 30
+                right+=30
+                if "s" in keys_pressed and "w" not in keys_pressed:
+                    right-=60
             elif key.char == "d":
-                if 'w' in keys_pressed and 'a' not in keys_pressed:
-                    left -= 30
-                elif 'a' in keys_pressed and 'w' not in keys_pressed:
-                    left += 30
-                else:
-                    left -= 30
+                left-=30
+                if "s" in keys_pressed and "w" not in keys_pressed:
+                    left+=60
             client_tcp.send(f"{right},{left}".encode("utf-8"))
     except AttributeError:
         if key == keyboard.Key.esc:
@@ -73,19 +78,15 @@ def on_release(key, client_tcp):
                 right += 50
                 left -= 50
             elif key.char == "a":
-                if 'w' in keys_pressed and 'd' not in keys_pressed:
-                    right -= 30
-                elif 'd' in keys_pressed and 'w' not in keys_pressed:
-                    right += 30
+                if right >0:
+                    right-=30
                 else:
-                    right -= 30
+                    right+=30
             elif key.char == "d":
-                if 'w' in keys_pressed and 'a' not in keys_pressed:
-                    left += 30
-                elif 'a' in keys_pressed and 'w' not in keys_pressed:
-                    left -= 30
+                if left >0:
+                    left-=30
                 else:
-                    left += 30
+                    left+=30
             client_tcp.send(f"{right},{left}".encode("utf-8"))
     except AttributeError:
         pass

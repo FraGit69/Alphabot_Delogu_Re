@@ -3,6 +3,8 @@ from pynput import keyboard
 import threading as t
 
 keys_granted = ["w", "a", "s", "d"]
+special_keys  = ["k", "m", "l", "n"]
+BUFFERSIZE = 409
 keys_pressed = []
 left = 0
 right = 0
@@ -28,53 +30,77 @@ def client():
             print("Connection closed.")
 
 def on_press(key, client_tcp):
-        try:
-            if key.char in keys_granted and key.char not in keys_pressed:
-                keys_pressed.append(key.char)
-                global left, right
-                if key.char == "w":
-                    right += 50
-                    left -= 50
-                elif key.char == "s":
-                    right -= 50
-                    left += 50
-                elif key.char == "a":
-                    left -= 30
-                elif key.char == "d":
-                    right += 30
-                client_tcp.send(f"{right},{left}".encode("utf-8"))
-        except AttributeError:
-            if key == keyboard.Key.esc:
-                client_tcp.send("end".encode("utf-8"))
-                client_tcp.recv()
-                return False
-            if key == keyboard.Key.shift: 
-                right=100
-                left=-100
-                client_tcp.send(f"{right},{left}".encode("utf-8"))
-            
+    try:
+        if key.char in keys_granted and key.char not in keys_pressed:
+            keys_pressed.append(key.char)
+            global left, right
+            if key.char == "w":
+                if 'a' in keys_pressed and 's' not in keys_pressed and right<0:
+                    right+=60
+                if 'd' in keys_pressed and 's' not in keys_pressed and left >0:
+                    left-=60
+
+                right += 50
+                left -= 50
+            elif key.char == "s":
+                if 'a' in keys_pressed and 'w' not in keys_pressed and right>0:
+                    right-=60
+                if 'd' in keys_pressed  and 'w' not in keys_pressed and left<0:
+                    left+=60
+
+                right -= 50
+                left += 50
+
+            elif key.char == "a":
+                right+=30
+                if "s" in keys_pressed and "w" not in keys_pressed:
+                    right-=60
+            elif key.char == "d":
+                left-=30
+                if "s" in keys_pressed and "w" not in keys_pressed:
+                    left+=60
+            client_tcp.send(f"{right},{left}".encode("utf-8"))
+        if key.char in special_keys and key.char not in keys_pressed:
+            keys_pressed.append(key.char)
+            client_tcp.send(key.char.encode("utf-8"))
+            client_tcp.recv(BUFFERSIZE)
+    except AttributeError:
+        if key == keyboard.Key.esc:
+            client_tcp.send("end".encode("utf-8"))
+            return False
+        if key == keyboard.Key.shift:
+            client_tcp.send(f"100,-100".encode("utf-8"))
+
 
 def on_release(key, client_tcp):
-        try:
-            if key.char in keys_granted and key.char in keys_pressed:
-                keys_pressed.remove(key.char)
-                global left, right
-                if key.char == "w":
-                    right -= 50
-                    left += 50
-                elif key.char == "s":
-                    right += 50
-                    left -= 50
-                elif key.char == "a":
-                    left += 30
-                elif key.char == "d":
-                    right -= 30
-                client_tcp.send(f"{right},{left}".encode("utf-8"))
-        except AttributeError:
-            if key == keyboard.Key.shift: 
-                right=0
-                left=0
-                client_tcp.send(f"{right},{left}".encode("utf-8"))
+    global left, right
+    try:
+        if key.char in keys_granted and key.char in keys_pressed:
+            keys_pressed.remove(key.char)
+            if key.char == "w":
+                right -= 50
+                left += 50
+            elif key.char == "s":
+                right += 50
+                left -= 50
+            elif key.char == "a":
+                if right >0:
+                    right-=30
+                else:
+                    right+=30
+            elif key.char == "d":
+                if left >0:
+                    left-=30
+                else:
+                    left+=30
+            client_tcp.send(f"{right},{left}".encode("utf-8"))
+        if key.char in special_keys and key.char in keys_pressed:
+            keys_pressed.remove(key.char)
+    except AttributeError:
+        if key == keyboard.Key.shift:
+            client_tcp.send(f"0,0".encode("utf-8"))
+
+
 
 if __name__ == "__main__":
     client()
