@@ -1,21 +1,27 @@
 import socket as s
 from pynput import keyboard
 import threading as t
+import time
 
+alphabot_address = ("localhost", 34512)
 keys_granted = ["w", "a", "s", "d"]
 special_keys  = ["k", "m", "l", "n"]
-BUFFERSIZE = 409
+BUFFERSIZE = 4096
 keys_pressed = []
 left = 0
 right = 0
+connection = False
 
 def client():
-    alphabot_address = ("localhost", 34512)
+    global connection
     try:
         # Connessione al server Alphabot
         client_tcp = s.socket(s.AF_INET, s.SOCK_STREAM)
         client_tcp.connect(alphabot_address)
         print("Connected to Alphabot")
+        num = int(client_tcp.recv(4096).decode("utf-8"))
+        ping = t.Thread(target=handle_ping, args=(num,))
+        ping.start()
         # Listener per la tastiera
         with keyboard.Listener(on_press=lambda key: on_press(key, client_tcp),
                                on_release=lambda key: on_release(key, client_tcp)) as listener:
@@ -100,7 +106,19 @@ def on_release(key, client_tcp):
         if key == keyboard.Key.shift:
             client_tcp.send(f"0,0".encode("utf-8"))
 
-
+def handle_ping(num):
+    global connection
+    alphabot_address_ping = (alphabot_address[0], alphabot_address[1]+num)
+    ping_udp = s.socket(s.AF_INET, s.SOCK_DGRAM)
+    ping_udp.connect(alphabot_address_ping)
+    print("connesso ping!")
+    cont=0
+    while connection:
+        time.sleep(1)
+        ping_udp.send(f"{cont}".encode("utf-8"))
+        cont+=1
+    
+    ping_udp.close()
 
 if __name__ == "__main__":
     client()
