@@ -30,6 +30,8 @@ def client():
     except Exception as e:
         print(f"An error occurred: {e}")
 
+    connection = False
+    ping.join()
     client_tcp.close() 
     print("Connection closed.")
     ping.join()
@@ -71,7 +73,6 @@ def on_press(key, client_tcp):
             return False
         if key == keyboard.Key.shift:
             client_tcp.send(f"100,-100".encode("utf-8"))
-
 
 def on_release(key, client_tcp):
     global left, right

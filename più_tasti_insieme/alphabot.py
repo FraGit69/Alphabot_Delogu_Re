@@ -17,22 +17,23 @@ try:
         while True:
             messaggio = client.recv(4096).decode('utf-8')
             if messaggio == "end":
-                alphabot_tcp.send()
-                alphabot_tcp.close()
-            
-            messaggio = messaggio.split(",")
-            try:
-                right = int(messaggio[0])
-            except:
-                right = eval(messaggio[0])
+                client.close()
+                break
+            else:
+                messaggio = messaggio.split(",")
+                try:
+                    right = int(messaggio[0])
+                except:
+                    right = eval(messaggio[0])
 
-            try:
-                left = int(messaggio[1])
-            except:
-                left = eval(messaggio[1])
+                try:
+                    left = int(messaggio[1])
+                except:
+                    left = eval(messaggio[1])
 
-            # alpha.setMotor(right, left)
-            print(right, left)
+                # alpha.setMotor(right, left)
+                print(right, left)
+        print(f"connessione chiusa con {address}")
 
 except KeyboardInterrupt:
     print("Server interrotto manualmente.")

@@ -18,6 +18,7 @@ def client():
         # Connessione al server Alphabot
         client_tcp = s.socket(s.AF_INET, s.SOCK_STREAM)
         client_tcp.connect(alphabot_address)
+        connection = True
         print("Connected to Alphabot")
         num = int(client_tcp.recv(4096).decode("utf-8"))
         ping = t.Thread(target=handle_ping, args=(num,))
@@ -30,10 +31,13 @@ def client():
         print("Connection to Alphabot refused")
     except Exception as e:
         print(f"An error occurred: {e}")
-    finally:
-        if 'client_tcp' in locals(): # verifico che la variabile client_tcp sia tra le variabili definite
-            client_tcp.close() 
-            print("Connection closed.")
+
+    connection = False
+    ping.join()
+    client_tcp.close() 
+    print("Connection closed.")
+    ping.join()
+
 
 def on_press(key, client_tcp):
     try:
