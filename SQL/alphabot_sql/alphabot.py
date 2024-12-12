@@ -62,7 +62,6 @@ def alphabot():
             while connection_active:
                 try:
                     messaggio = client.recv(4096).decode('utf-8')
-                    print(messaggio)
                     if messaggio == "end":
                         connection_active = False
                     else:
