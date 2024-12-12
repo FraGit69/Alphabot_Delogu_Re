@@ -13,6 +13,7 @@ def handle_ping(num):
     global connection_active
     alphabot_address_ping = (alphabot_address[0], alphabot_address[1]+num)
     ping_udp = s.socket(s.AF_INET, s.SOCK_DGRAM)
+    ping_udp.settimeout(2)
     ping_udp.bind(alphabot_address_ping)
     last_ping = -1
     while connection_active:
@@ -28,7 +29,7 @@ def handle_ping(num):
         except s.timeout:
             print("Timeout nell'heartbeat")
             connection_active = False
-        except Exception as e:
+        except (s.error, ConnectionResetError) as e:
             print(f"Errore nell'heartbeat: {e}")
             connection_active = False
 
@@ -48,10 +49,9 @@ def alphabot():
     movimenti = {key:mov for key, mov in cur.fetchall()}
     print(movimenti)
 
+    # alpha = alphaLib.AlphaBot()
     try:
-        # alpha = alphaLib.AlphaBot()
         while True:
-            
             client, address = alphabot_tcp.accept()
             connection_active = True
             num = 1
@@ -60,44 +60,46 @@ def alphabot():
             thread_ping.start()
             print(f"Connessione accettata da {address}")
             while connection_active:
-                messaggio = client.recv(4096).decode('utf-8')
-                print(messaggio)
-                if messaggio == "end":
-                    connection_active = False
-                    client.close()
-                    break
-                else:
-                    messaggio = messaggio.split(",")
-                    if len(messaggio)==2:
-                        try:
-                            right = int(messaggio[0])
-                        except:
-                            right = eval(messaggio[0])
-
-                        try:
-                            left = int(messaggio[1])
-                        except:
-                            left = eval(messaggio[1])
-
-                        # alpha.setMotor(right, left)
-                        print(f"{right},{left}")
+                try:
+                    messaggio = client.recv(4096).decode('utf-8')
+                    print(messaggio)
+                    if messaggio == "end":
+                        connection_active = False
                     else:
-                        movimento = movimenti[messaggio[0]].split(',')
-                        for mov in movimento:
-                            dir, temp = mov.split(':')
-                            print(dir)
-                            # if dir == 'W':
-                            #     alpha.forward()
-                            # elif dir == 'S':
-                            #     alpha.backward()
-                            # elif dir == 'D':
-                            #     alpha.right()
-                                
-                            # elif dir == 'A':
-                            #     alpha.left()
-                            time.sleep(int(temp)) 
-                        client.send("finish".encode('utf-8')) 
+                        messaggio = messaggio.split(",")
+                        if len(messaggio)==2:
+                            try:
+                                right = int(messaggio[0])
+                            except:
+                                right = eval(messaggio[0])
+
+                            try:
+                                left = int(messaggio[1])
+                            except:
+                                left = eval(messaggio[1])
+
+                            # alpha.setMotor(right, left)
+                            print(f"{right},{left}")
+                        else:
+                            movimento = movimenti[messaggio[0]].split(',')
+                            for mov in movimento:
+                                dir, temp = mov.split(':')
+                                print(dir)
+                                # if dir == 'W':
+                                #     alpha.forward()
+                                # elif dir == 'S':
+                                #     alpha.backward()
+                                # elif dir == 'D':
+                                #     alpha.right()
+                                    
+                                # elif dir == 'A':
+                                #     alpha.left()
+                                time.sleep(int(temp)) 
+                            client.send("finish".encode('utf-8')) 
+                except:
+                    connection_active = False
             thread_ping.join()
+            client.close()
             #alpha.stop()
             print(f"Connessione chiusa con {address}")
     except KeyboardInterrupt:

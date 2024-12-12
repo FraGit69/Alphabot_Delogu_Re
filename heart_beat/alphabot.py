@@ -13,6 +13,7 @@ def handle_ping(num):
     global connection_active
     alphabot_address_ping = (alphabot_address[0], alphabot_address[1]+num)
     ping_udp = s.socket(s.AF_INET, s.SOCK_DGRAM)
+    ping_udp.settimeout(2)
     ping_udp.bind(alphabot_address_ping)
     last_ping = -1
     while connection_active:
@@ -28,7 +29,7 @@ def handle_ping(num):
         except s.timeout:
             print("Timeout nell'heartbeat")
             connection_active = False
-        except Exception as e:
+        except (s.error, ConnectionResetError) as e:
             print(f"Errore nell'heartbeat: {e}")
             connection_active = False
 
@@ -55,32 +56,35 @@ def alphabot():
             thread_ping.start()
             print(f"Connessione accettata da {address}")
             while connection_active:
-                messaggio = client.recv(4096).decode('utf-8')
-                if messaggio == "end":
-                    connection_active=False
-                    client.close()
-                else:
-                    messaggio = messaggio.split(",")
-                    try:
-                        right = int(messaggio[0])
-                    except:
-                        right = eval(messaggio[0])
+                try:
+                    messaggio = client.recv(4096).decode('utf-8')
+                    if messaggio == "end":
+                        connection_active=False
+                    else:
+                        messaggio = messaggio.split(",")
+                        try:
+                            right = int(messaggio[0])
+                        except:
+                            right = eval(messaggio[0])
 
-                    try:
-                        left = int(messaggio[1])
-                    except:
-                        left = eval(messaggio[1])
+                        try:
+                            left = int(messaggio[1])
+                        except:
+                            left = eval(messaggio[1])
 
-                    # alpha.setMotor(right, left)
-                    print(right, left)
+                        # alpha.setMotor(right, left)
+                        print(right, left)
+                except:
+                    connection_active = False
+                client.close()
             thread_ping.join()
             print(f"connessione chiusa con {address}")
+            # alpha.stop()
 
     except KeyboardInterrupt:
         print("Server interrotto manualmente.")
     
     alphabot_tcp.close()
-    # alpha.stop()
     print("Server chiuso.")
 
 if __name__ == "__main__":
