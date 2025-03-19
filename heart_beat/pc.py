@@ -3,12 +3,13 @@ from pynput import keyboard
 import threading as t
 import time
 
-alphabot_address = ("localhost", 34512)
+alphabot_address = ("192.168.1.136", 34512)
 keys_granted = ["w", "a", "s", "d"]
 keys_pressed = []
 left = 0
 right = 0
 connection = False
+ping_started = False
 
 def client():
     global connection
@@ -25,16 +26,17 @@ def client():
         with keyboard.Listener(on_press=lambda key: on_press(key, client_tcp),
                                on_release=lambda key: on_release(key, client_tcp)) as listener:
             listener.join()  # Mantiene il listener attivo finché non viene fermato
+        
     except ConnectionRefusedError:
         print("Connection to Alphabot refused")
     except Exception as e:
         print(f"An error occurred: {e}")
 
     connection = False
-    ping.join()
+    if ping_started:
+        ping.join()
     client_tcp.close() 
     print("Connection closed.")
-    ping.join()
 
 def on_press(key, client_tcp):
     try:
@@ -66,13 +68,14 @@ def on_press(key, client_tcp):
                 left-=30
                 if "s" in keys_pressed and "w" not in keys_pressed:
                     left+=60
-            client_tcp.send(f"{right},{left}".encode("utf-8"))
+            client_tcp.send(f"{-right},{-left}".encode("utf-8"))
+            
     except AttributeError:
         if key == keyboard.Key.esc:
             client_tcp.send("end".encode("utf-8"))
             return False
         if key == keyboard.Key.shift:
-            client_tcp.send(f"100,-100".encode("utf-8"))
+            client_tcp.send(f"-100,100".encode("utf-8"))
 
 def on_release(key, client_tcp):
     global left, right
@@ -101,7 +104,9 @@ def on_release(key, client_tcp):
             client_tcp.send(f"0,0".encode("utf-8"))
 
 def handle_ping(num):
+    global ping_started
     global connection
+    ping_started = True
     alphabot_address_ping = (alphabot_address[0], alphabot_address[1]+num)
     ping_udp = s.socket(s.AF_INET, s.SOCK_DGRAM)
     ping_udp.connect(alphabot_address_ping)

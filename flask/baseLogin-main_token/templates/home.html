@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Design by foolishdeveloper.com -->
+  <title>Home</title>
+
+  <!-- <link rel="preconnect" href="https://fonts.gstatic.com"> -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+  <!--Stylesheet-->
+  <link rel="stylesheet" type="text/css" href="../static/style.css">
+</head>
+
+<body>
+  <div class="background">
+    <div class="shape"></div>
+    <div class="shape"></div>
+  </div>
+
+
+
+  <div class="container">
+    <div class="controls">
+      <button name="action" value="forward" form="controlForm" class="direction-button" aria-label="Muovi su">↑</button>
+      <button name="action" value="left" form="controlForm" class="direction-button" aria-label="Muovi sinistra">←</button>
+      <button name="action" value="backward" form="controlForm" class="direction-button" aria-label="Muovi giù">↓</button>
+      <button name="action" value="right" form="controlForm" class="direction-button" aria-label="Muovi destra">→</button>
+      <button name="action" value="stop" form="controlForm" class="stop-button" aria-label="Ferma AlphaBot">STOP</button>
+      <button name="action" value="sprint" form="controlForm" class="sprint-button" aria-label="Sprint AlphaBot">SPRINT</button>
+      <form id="controlForm" method="post">
+          <input type="hidden" name="action" value="">
+      </form>
+    </div>
+    <form action="{{ url_for('logout') }}" method="get">
+      <h3>Benvenuto, {{ username }}!</h3>
+      <button type="submit">Logout</button>
+    </form>
+  </div>
+  
+</body>
+
+</html>

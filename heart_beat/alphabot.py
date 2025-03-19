@@ -1,7 +1,6 @@
 import socket as s
 # import alphaLib
 import threading as t
-import time
 
 TIMEOUT_CLIENT = 2 # sec
 
@@ -34,7 +33,6 @@ def handle_ping(num):
             connection_active = False
 
     ping_udp.close()
-
 
 def alphabot():
     global connection_active
@@ -76,7 +74,7 @@ def alphabot():
                         print(right, left)
                 except:
                     connection_active = False
-                client.close()
+            client.close()
             thread_ping.join()
             print(f"connessione chiusa con {address}")
             # alpha.stop()

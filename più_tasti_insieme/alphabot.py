@@ -1,5 +1,5 @@
 import socket
-# import alphaLib
+import alphaLib
 
 tastiConcessi = ['w', 'a', 's', 'd']
 alphabot_address = ("localhost", 34512)
@@ -9,7 +9,7 @@ alphabot_tcp.bind(alphabot_address)
 alphabot_tcp.listen(1)
 print("Server AlphaBot in ascolto...")
 
-# alpha = alphaLib.AlphaBot()
+alpha = alphaLib.AlphaBot()
 try:
     while True:
         client, address = alphabot_tcp.accept()
@@ -31,9 +31,15 @@ try:
                 except:
                     left = eval(messaggio[1])
 
-                # alpha.setMotor(right, left)
+
+                if left >100 or left <-100:
+                    left /=10
+                if right >100 or left <-100:
+                    right/=10
+                alpha.setMotor(right, left)
                 print(right, left)
         print(f"connessione chiusa con {address}")
+        alpha.stop()
 
 except KeyboardInterrupt:
     print("Server interrotto manualmente.")

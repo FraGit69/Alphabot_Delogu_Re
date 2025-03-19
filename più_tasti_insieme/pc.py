@@ -1,7 +1,7 @@
 import socket as s
 from pynput import keyboard
 import threading as t
-
+import time
 keys_granted = ["w", "a", "s", "d"]
 BUFFERSIZE = 4096
 keys_pressed = []
@@ -9,7 +9,7 @@ left = 0
 right = 0
 
 def client():
-    alphabot_address = ("localhost", 34512)
+    alphabot_address = ("192.168.1.117", 34512)
     try:
         # Connessione al server Alphabot
         client_tcp = s.socket(s.AF_INET, s.SOCK_STREAM)
@@ -58,14 +58,14 @@ def on_press(key, client_tcp):
                 left-=30
                 if "s" in keys_pressed and "w" not in keys_pressed:
                     left+=60
-            client_tcp.send(f"{right},{left}".encode("utf-8"))
+            client_tcp.send(f"{-right},{-left}".encode("utf-8"))
+            
     except AttributeError:
         if key == keyboard.Key.esc:
             client_tcp.send("end".encode("utf-8"))
             return False
         if key == keyboard.Key.shift:
-            client_tcp.send(f"100,-100".encode("utf-8"))
-
+            client_tcp.send(f"-100,100".encode("utf-8"))
 
 def on_release(key, client_tcp):
     global left, right
@@ -88,10 +88,10 @@ def on_release(key, client_tcp):
                     left-=30
                 else:
                     left+=30
-            client_tcp.send(f"{right},{left}".encode("utf-8"))
+            client_tcp.send(f"{-right},{-left}".encode("utf-8"))
     except AttributeError:
         if key == keyboard.Key.shift:
-            client_tcp.send(f"0,0".encode("utf-8"))
+            client_tcp.send(f"{left},{right}".encode("utf-8"))
 
 
 
