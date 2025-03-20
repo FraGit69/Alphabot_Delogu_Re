@@ -3,7 +3,7 @@ from pynput import keyboard
 import threading as t
 import time
 
-alphabot_address = ("192.168.1.136", 34512)
+alphabot_address = ("localhost", 34512)
 keys_granted = ["w", "a", "s", "d"]
 keys_pressed = []
 left = 0

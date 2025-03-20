@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/style.css">
+    <title>Controllo AlphaBot</title>
+</head>
+<body>
+    <div class="background">
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    <div class="container1">
+        <h1>CONTROLLO ALPHABOT</h1>
+        <div class="controls">
+            <button name="action" value="forward" form="controlForm" class="direction-button" aria-label="Muovi su">↑</button>
+            <button name="action" value="left" form="controlForm" class="direction-button" aria-label="Muovi sinistra">←</button>
+            <button name="action" value="backward" form="controlForm" class="direction-button" aria-label="Muovi giù">↓</button>
+            <button name="action" value="right" form="controlForm" class="direction-button" aria-label="Muovi destra">→</button>
+            <button name="action" value="stop" form="controlForm" class="stop-button" aria-label="Ferma AlphaBot">STOP</button>
+            <button name="action" value="sprint" form="controlForm" class="sprint-button" aria-label="Sprint AlphaBot">SPRINT</button>
+        </div>
+    </div>
+    <div class="container2">
+            <form id="controlForm" method="post">
+                <input type="hidden" name="action" value="">
+            </form>
+        
+        <form action="{{ url_for('logout') }}" method="get">
+            <h3>Benvenuto !</h3>
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+</body>
+</html>

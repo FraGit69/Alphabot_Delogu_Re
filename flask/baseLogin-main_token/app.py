@@ -41,8 +41,8 @@ def verify_token(token):
     except jwt.InvalidTokenError:
         return None  # Token non valido
 
-@app.route("/home", methods=["GET", "POST"])
-def home():
+@app.route("/alphabot", methods=["GET", "POST"])
+def index():
     action = None
     if request.method == 'POST':
        action = request.form.get('action')
@@ -60,7 +60,7 @@ def home():
     username = verify_token(token)
     print(username)
     if username:
-        return render_template("home.html", username=username)
+        return render_template("index.html", username=username)
     return logout()
 
 
@@ -68,10 +68,10 @@ def home():
 @app.route("/", methods=["GET", "POST"])
 def login():
     if request.cookies.get('token'):
-        return redirect(url_for("home"))
+        return redirect(url_for("alphabot"))
     else: 
         if request.method == "POST":
-            email = request.form["e-mail"]
+            email = request.form["email"]
             password = request.form["password"]
             return validate(email, password)
         return render_template("login.html")
@@ -80,7 +80,7 @@ def login():
 @app.route("/create_account", methods=["GET", "POST"])
 def create_account():
     if request.method == "POST":
-        email = request.form["e-mail"]
+        email = request.form["email"]
         password = request.form["password"]
         conn = sql.connect("users.db")
         cur = conn.cursor()
@@ -114,7 +114,7 @@ def validate(username, password):
     
     if pswd and check_password_hash(pswd[0], password):
         token = generate_token(username)
-        resp = redirect(url_for("home"))
+        resp = redirect(url_for("alphabot"))
         resp.set_cookie('token', token, httponly=True)  # Memorizza il token nel cookie
         return resp
     
