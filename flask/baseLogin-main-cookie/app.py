@@ -1,9 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, session, make_response
+from flask import Flask, render_template, request, redirect, url_for, session, make_response, jsonify
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
+import alphaLib as ab
 
 app = Flask(__name__)
 app.secret_key = "secret_key"  # Chiave segreta necessaria per le sessioni e i messaggi flash
+alpha = ab.AlphaBot()
 
 # Funzione per inizializzare il database e creare la tabella utenti se non esiste
 def init_db():
@@ -55,9 +57,24 @@ def login():
 @app.route("/alphabot", methods=['GET', 'POST'])
 def alphabot():
     if request.method == 'POST':
-        action = request.form.get('action')
+        data = request.get_json()
+        action = data.get('action')
+        if action == 'right':
+            alpha.right()
+        if action == 'left':
+            alpha.left()
+        if action == 'forward':
+            alpha.forward()
+        if action == 'backward':
+            alpha.backward()
+        if action == 'sprint':
+            alpha.setMotor(80, 80)
+        if action == 'stop':
+            alpha.stop()
+       # Qui puoi gestire l'azione ricevuta (ad esempio, inviare comandi all'AlphaBot)
         # Qui puoi gestire l'azione ricevuta (ad esempio, inviare comandi all'AlphaBot)
         print(f"Azione ricevuta: {action}")
+        return jsonify({"status": "success", "action": action})
     return render_template('index.html')
 
 # Rotta per la creazione di un nuovo account
