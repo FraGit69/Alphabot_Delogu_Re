@@ -34,16 +34,19 @@ def alphabot():
         action = data.get('action')
         if action == 'right':
             alpha.right()
-        if action == 'left':
+        elif action == 'left':
             alpha.left()
-        if action == 'forward':
+        elif action == 'forward':
             alpha.forward()
-        if action == 'backward':
+        elif action == 'backward':
             alpha.backward()
-        if action == 'sprint':
+        elif action == 'sprint':
             alpha.setMotor(80, 80)
-        if action == 'stop':
+        elif action == 'stop':
             alpha.stop()
+        else:
+            alpha.stop()
+            return jsonify({"error": "Invalid action"})
        # Qui puoi gestire l'azione ricevuta (ad esempio, inviare comandi all'AlphaBot)
         print(f"Azione ricevuta: {action}")
         return jsonify({"status": "success", "action": action})
@@ -96,6 +99,7 @@ def validate(username, password):
     conn = sql.connect("users.db")
     cur = conn.cursor()
     cur.execute(f"""SELECT users.password FROM users WHERE email = ?""", (username,))
+    conn.close()
     pswd = cur.fetchone()
     
     if pswd and check_password_hash(pswd[0], password):

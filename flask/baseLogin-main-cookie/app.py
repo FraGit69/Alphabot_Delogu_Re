@@ -40,6 +40,7 @@ def login():
             cursor = conn.cursor()
             cursor.execute("SELECT password FROM utenti WHERE username = ?", (username,))
             user = cursor.fetchone()
+            conn.close()
             print(f"Risultato query: {user}")  # Debug
 
         if user is not None:
